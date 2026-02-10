@@ -1,65 +1,69 @@
-let travelData = [];
+let apiData = {};
 
-/* ================= FETCH JSON DATA ================= */
+
 fetch("travel_recommendation_api.json")
     .then(response => response.json())
     .then(data => {
-        travelData = data;
-        console.log("API data loaded:", travelData);
+        apiData = data;
+        console.log("Travel API loaded:", apiData);
     })
-    .catch(error => console.error("Error loading data:", error));
+    .catch(error => console.error("API load error:", error));
 
-/* ================= SEARCH FUNCTION ================= */
+
 function searchRecommendations() {
-    const keyword = document.getElementById("searchInput").value
+    const keyword = document
+        .getElementById("searchInput")
+        .value
         .toLowerCase()
         .trim();
 
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = "";
+    const results = document.getElementById("results");
+    results.innerHTML = "";
 
     if (!keyword) return;
 
-    let matchedResults = [];
+    let recommendations = [];
 
     if (keyword.includes("beach")) {
-        matchedResults = travelData.beaches;
+        recommendations = apiData.beaches || [];
     } else if (keyword.includes("temple")) {
-        matchedResults = travelData.temples;
+        recommendations = apiData.temples || [];
     } else if (keyword.includes("country")) {
-        matchedResults = travelData.countries;
+        recommendations = apiData.countries || [];
     }
 
-    matchedResults.slice(0, 2).forEach(place => {
+    recommendations.slice(0, 2).forEach(item => {
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-            <img src="${place.imageUrl}" alt="${place.name}">
-            <h3>${place.name}</h3>
-            <p>${place.description}</p>
+            <img src="${item.imageUrl}" alt="${item.name}">
+            <div class="card-content">
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+            </div>
         `;
 
-        resultsDiv.appendChild(card);
+        results.appendChild(card);
     });
 }
 
-/* ================= CLEAR RESULTS ================= */
+
 function clearResults() {
     document.getElementById("results").innerHTML = "";
     document.getElementById("searchInput").value = "";
 }
 
-/* ================= OPTIONAL: COUNTRY TIME ================= */
-function showCountryTime(timeZone, countryName) {
+
+function showCountryTime(timeZone, country) {
     const options = {
-        timeZone: timeZone,
+        timeZone,
         hour12: true,
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric"
     };
 
     const time = new Date().toLocaleTimeString("en-US", options);
-    console.log(`Current time in ${countryName}:`, time);
+    console.log(`Current time in ${country}:`, time);
 }
